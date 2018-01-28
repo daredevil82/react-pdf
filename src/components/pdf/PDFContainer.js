@@ -115,7 +115,6 @@ class Container extends Component {
     // Updates and re-renders are particularly expensive with PDF documents, so we want
     // to limit only in specific changes, specifically document, page and scale changes
     shouldComponentUpdate(nextProps, nextState) {
-        console.debug(`${this.constructor.name} shouldComponentUpdate`);
         return this.state.document !== nextState.document ||
             this.state.scale !== nextState.scale ||
             this.state.page !== nextState.page;
