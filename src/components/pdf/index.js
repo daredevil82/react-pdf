@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import PDFContainer from './PDFContainer';
+import Toolbar from './Toolbar';
 
 import pdfjslib from 'pdfjs-dist/webpack';
 
@@ -20,6 +21,8 @@ class PDF extends Component {
         
         this.onScaleChanged = this.onScaleChanged.bind(this);
         this.onPageNumberChanged = this.onPageNumberChanged.bind(this);
+        this.onZoomIn = this.onZoomIn.bind(this);
+        this.onZoomOut = this.onZoomOut.bind(this);
         
     }
     
@@ -59,12 +62,32 @@ class PDF extends Component {
         });
     }
     
+    onZoomIn(e) {
+        this.container.setState({
+            scale: this.container.state.scale * 1.1
+        });
+    }
+    
+    onZoomOut(e) {
+        this.container.setState({
+            scale: this.container.state.scale / 1.1
+        });
+    }
+    
     render () {
         return(
-            <PDFContainer onScaleChange={this.onScaleChanged}
-                          onPageChange={this.onPageNumberChanged}
-                          ref={ref => this.container = ref}
-            />
+            <div>
+                <Toolbar onZoomIn={this.onZoomIn}
+                         onZoomOut={this.onZoomOut}
+                         page={this.state.page}
+                         pageCount={this.state.pageCount}
+                         scale={this.state.scale}
+                />
+                <PDFContainer onScaleChange={this.onScaleChanged}
+                              onPageChange={this.onPageNumberChanged}
+                              ref={ref => this.container = ref}
+                />
+            </div>
         )
     }
     

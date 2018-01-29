@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.0.0",
+    "bootstrap": "3.3.7",
+    "font-awesome": "^4.7.0",
     "pdfjs-dist": "^2.0.301",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
