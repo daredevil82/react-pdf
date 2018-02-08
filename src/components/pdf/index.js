@@ -23,19 +23,13 @@ class PDF extends Component {
         
         this.state = {
             page: 0,
-            pageCount: 0,
-            document: {}
+            pageCount: 0
         };
     
         this.onPageNumberChanged = this.onPageNumberChanged.bind(this);
     }
     
     componentDidMount() {
-        /*
-        For some reason I'm not entirely clear on why, PDFJS with React requires a reference in this parent
-        component and inject the document content directly via the ref.
-         */
-    
         const loadingTask = pdfjslib.getDocument(this.props.url);
         loadingTask.promise
                    .then(document => {
@@ -46,7 +40,6 @@ class PDF extends Component {
                            pageCount: document.numPages,
                            page: this.container.pdfViewer.currentPageNumber,
                            scale: this.container.pdfViewer.currentScaleValue,
-                           document: document
                        });
                        
                    }, err => {
