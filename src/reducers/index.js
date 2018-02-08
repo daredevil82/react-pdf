@@ -8,12 +8,10 @@ const pdfReducer = (state = initialState.pdf, action) => {
             return Object.assign({}, state, {scale: state.scale / 1.1});
         case types.ON_ZOOM_IN:
             return Object.assign({}, state, {scale: state.scale * 1.1});
-        case types.ON_SCALE_CHANGE:
-            return Object.assign({}, state, {scale: action.scale});
         case types.ON_PAGE_CHANGE:
-            return Object.assign({}, state, {page: action.page});
+            return Object.assign({}, state, {page: action.currentPage});
         case types.LOAD_DOCUMENT:
-            return Object.assign({}, state, {document: action.document})
+            return Object.assign({}, state, {document: action.document});
             
             
         default:

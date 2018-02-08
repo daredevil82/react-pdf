@@ -11,12 +11,6 @@ import styled from 'styled-components';
 
 import {onZoomIn, onZoomOut} from "../../actions/pdfActions";
 
-const PdfNavbar = styled.div`
-  //position: absolute;
-  //top: 0;
-  //left: 0;
-`;
-
 const ZoomItem = styled.div`
   display: inline-block;
   float: left;
@@ -28,7 +22,6 @@ const ZoomItem = styled.div`
 
 const Toolbar = props => {
     return (
-        <PdfNavbar>
             <Navbar>
                 <Nav pullLeft>
                     <NavItem>
@@ -48,13 +41,10 @@ const Toolbar = props => {
                 </Nav>
             </Navbar>
             
-        </PdfNavbar>
     );
 };
 
 Toolbar.propTypes = {
-    // onZoomIn: PropTypes.func.isRequired,
-    // onZoomOut: PropTypes.func.isRequired,
     page: PropTypes.number,
     pageCount: PropTypes.number,
     scale: PropTypes.number,

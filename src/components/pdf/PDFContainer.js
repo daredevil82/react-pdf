@@ -27,7 +27,6 @@ const PDFContainer = styled.div`
   }
 `;
 
-
 /**
  * The container of the PDF viewer, which holds the rendered content from the PDFJS lib as
  * well as responsible for setting up the various event listeners.
@@ -36,12 +35,6 @@ class Container extends Component {
     
     constructor (props, context) {
         super(props, context);
-        
-        this.state = {
-            document: null,
-            scale: 1.0,
-            page: undefined
-        };
         
         // Sometimes, its necessary to keep component level variables outside of React's state
         // because of the asynchronous batch updates of state changes.
@@ -61,22 +54,16 @@ class Container extends Component {
     
     /**
      * Define event listeners for specific events on this application.
+     *
+     * DOM events are available at https://github.com/yurydelendik/pdf.js/blob/master/web/dom_events.js
+     *
      */
     initEventBus() {
         const eventBus = new PDFJSViewer.EventBus();
         eventBus.on('pagesinit', () => {
             this.pdfViewer.currentScale = 1.0;
-            this.setState({
-                scale: this.pdfViewer.currentScale,
-                page: this.pdfViewer.currentPageNumber
-            }, () => {
-                this.props.onScaleChange({scale: this.state.scale});
-                this.props.onPageChange({page: this.state.page});
-            });
         });
         
-        //eventBus.on('pagesloaded', this._pageLoadHandler);
-        eventBus.on('scalechange', e => this.props.onScaleChange(e.scale));
         eventBus.on('pagechange', e => this.props.onPageChange(e.pageNumber));
         eventBus.on('textlayerrendered', e => {});
         
@@ -91,39 +78,6 @@ class Container extends Component {
         });
     }
     
-    componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
-    }
-    
-    // TODO is this really necessary?  Can we use componentWillRecieveProps instead?
-    componentWillUpdate(nextProps, nextState) {
-        if (this.state.document !== nextState.document){
-            this.setState({
-                document: nextState.document
-            }, () => this.pdfViewer.setDocument(nextState.document));
-        }
-
-        if (this.state.scale !== nextState.scale) {
-            this.setState({
-                scale: nextState.scale
-            }, () => this.pdfViewer.currentScale = nextState.scale);
-        }
-
-        if (this.state.page !== nextState.page) {
-            this.setState({
-                page: nextState.page
-            }, () => this.pdfViewer.pageNumber = nextState.page);
-        }
-    }
-    //
-    // Updates and re-renders are particularly expensive with PDF documents, so we want
-    // to limit only in specific changes, specifically document, page and scale changes
-    shouldComponentUpdate(nextProps, nextState) {
-        return this.state.document !== nextState.document ||
-            this.state.scale !== nextState.scale ||
-            this.state.page !== nextState.page;
-    }
-    
     render () {
         return(
             <PDFContainer id='viewer-container'>
@@ -134,7 +88,6 @@ class Container extends Component {
 }
 
 Container.propTypes = {
-    onScaleChange: PropTypes.func.isRequired,
     onPageChange: PropTypes.func.isRequired,
 };
 
@@ -148,6 +101,9 @@ Container.propTypes = {
 //     };
 // };
 //
+//  Don't use this.  In parent component, we need to use `this.container` reference to inject state property updates
+//  to stick with PDFJS.  Adding `connect` here, even with the `withRef` option blows that connection up and the document
+//  will not be rendered.
 // export default connect(mapStateToProps, mapDispatchToProps, null,  {withRef: true})(Container);
 
 export default Container;

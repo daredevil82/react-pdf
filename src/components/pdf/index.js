@@ -6,14 +6,15 @@ import Toolbar from './Toolbar';
 import pdfjslib from 'pdfjs-dist/webpack';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {onZoomIn, onZoomOut, onScaleChanged, onPageChange} from "../../actions/pdfActions";
-import configureStore from './../../store';
-
-const store = configureStore();
+import {onZoomIn, onZoomOut, onPageChange} from "../../actions/pdfActions";
 
 /**
  * Primary component of the PDF viewer.  Responsible for loading the document content
  * and handling zoom and scale changes
+ *
+ * Because react and pdfjs are very different libraries, the best way to interact with PDFs
+ * is to actually inject the value changes and properties on the referenced `pdfViewer` object
+ * inside the child component.
  */
 class PDF extends Component {
     
@@ -21,11 +22,11 @@ class PDF extends Component {
         super(props, context);
         
         this.state = {
+            page: 0,
             pageCount: 0,
             document: {}
         };
     
-        this.onScaleChanged = this.onPageNumberChanged.bind(this);
         this.onPageNumberChanged = this.onPageNumberChanged.bind(this);
     }
     
@@ -38,16 +39,16 @@ class PDF extends Component {
         const loadingTask = pdfjslib.getDocument(this.props.url);
         loadingTask.promise
                    .then(document => {
-                       this.container.setState({
-                           document: document,
-                       }, () => {
-                           this.setState({
-                               pageCount: document.numPages,
-                               page: 0,
-                               scale: undefined,
-                               document: document
-                           });
+                       
+                       this.container.pdfViewer.setDocument(document);
+                       
+                       this.setState({
+                           pageCount: document.numPages,
+                           page: this.container.pdfViewer.currentPageNumber,
+                           scale: this.container.pdfViewer.currentScaleValue,
+                           document: document
                        });
+                       
                    }, err => {
                        console.error('Error loading document');
                        console.error(err);
@@ -55,52 +56,44 @@ class PDF extends Component {
     }
     
     componentWillReceiveProps(nextProps) {
-        console.log(nextProps);
+        const {scale} = nextProps;
         
-        const {state:{scale}} = nextProps;
-        
-        if (scale !== this.container.state.scale) {
-            this.container.setState({scale});
+        if (scale !== this.container.pdfViewer.currentScale) {
+            this.container.pdfViewer.currentScale = scale;
         }
     }
     
-    onScaleChanged(e) {
-        store.dispatch(onScaleChanged(e));
-    }
-    
     onPageNumberChanged(e) {
-        store.dispatch(onPageChange(e));
+        this.props.actions.onPageChange(e);
     }
     
     render () {
         return(
             <div>
-                <Toolbar
-                         page={this.state.page}
+                <Toolbar page={this.props.page}
                          pageCount={this.state.pageCount}
-                         scale={this.props.state.scale}
+                         scale={this.props.scale}
                 />
-                <PDFContainer onScaleChange={this.onScaleChanged}
-                              onPageChange={this.onPageNumberChanged}
+                <PDFContainer onPageChange={this.onPageNumberChanged}
                               ref={ref => this.container = ref}
                 />
             </div>
         )
     }
-    
 }
 
 PDF.propTypes = {
     url: PropTypes.string.isRequired
 };
 
-const mapStateToProps = (state, ownProps) => {
-    return {state};
-};
+const mapStateToProps = (state, ownProps) => ({
+    page: state.page === 0 ? 1 : state.page,
+    scale: state.scale
+});
 
 const mapDispatchToProps = dispatch => {
     return {
-        actions: bindActionCreators({onZoomIn, onZoomOut, onScaleChanged}, dispatch)
+        actions: bindActionCreators({onZoomIn, onZoomOut, onPageChange}, dispatch)
     };
 };
 
