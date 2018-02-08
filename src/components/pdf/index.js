@@ -4,6 +4,12 @@ import PDFContainer from './PDFContainer';
 import Toolbar from './Toolbar';
 
 import pdfjslib from 'pdfjs-dist/webpack';
+import {connect} from "react-redux";
+import {bindActionCreators} from "redux";
+import {onZoomIn, onZoomOut, onScaleChanged, onPageChange} from "../../actions/pdfActions";
+import configureStore from './../../store';
+
+const store = configureStore();
 
 /**
  * Primary component of the PDF viewer.  Responsible for loading the document content
@@ -18,12 +24,9 @@ class PDF extends Component {
             pageCount: 0,
             document: {}
         };
-        
-        this.onScaleChanged = this.onScaleChanged.bind(this);
+    
+        this.onScaleChanged = this.onPageNumberChanged.bind(this);
         this.onPageNumberChanged = this.onPageNumberChanged.bind(this);
-        this.onZoomIn = this.onZoomIn.bind(this);
-        this.onZoomOut = this.onZoomOut.bind(this);
-        
     }
     
     componentDidMount() {
@@ -36,12 +39,13 @@ class PDF extends Component {
         loadingTask.promise
                    .then(document => {
                        this.container.setState({
-                           document: document
+                           document: document,
                        }, () => {
                            this.setState({
                                pageCount: document.numPages,
                                page: 0,
-                               scale: undefined
+                               scale: undefined,
+                               document: document
                            });
                        });
                    }, err => {
@@ -50,38 +54,31 @@ class PDF extends Component {
                    });
     }
     
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
+        
+        const {state:{scale}} = nextProps;
+        
+        if (scale !== this.container.state.scale) {
+            this.container.setState({scale});
+        }
+    }
+    
     onScaleChanged(e) {
-        this.setState({
-            scale: e.scale
-        });
+        store.dispatch(onScaleChanged(e));
     }
     
     onPageNumberChanged(e) {
-        this.setState({
-            page: e.page
-        });
-    }
-    
-    onZoomIn(e) {
-        this.container.setState({
-            scale: this.container.state.scale * 1.1
-        });
-    }
-    
-    onZoomOut(e) {
-        this.container.setState({
-            scale: this.container.state.scale / 1.1
-        });
+        store.dispatch(onPageChange(e));
     }
     
     render () {
         return(
             <div>
-                <Toolbar onZoomIn={this.onZoomIn}
-                         onZoomOut={this.onZoomOut}
+                <Toolbar
                          page={this.state.page}
                          pageCount={this.state.pageCount}
-                         scale={this.state.scale}
+                         scale={this.props.state.scale}
                 />
                 <PDFContainer onScaleChange={this.onScaleChanged}
                               onPageChange={this.onPageNumberChanged}
@@ -97,4 +94,14 @@ PDF.propTypes = {
     url: PropTypes.string.isRequired
 };
 
-export default PDF;
+const mapStateToProps = (state, ownProps) => {
+    return {state};
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        actions: bindActionCreators({onZoomIn, onZoomOut, onScaleChanged}, dispatch)
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps, null, {withRef: true})(PDF);

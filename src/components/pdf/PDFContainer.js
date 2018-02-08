@@ -76,8 +76,8 @@ class Container extends Component {
         });
         
         //eventBus.on('pagesloaded', this._pageLoadHandler);
-        eventBus.on('scalechange', e => this.props.onScaleChange({scale: e.scale}));
-        eventBus.on('pagechange', e => this.props.onPageChange({page: e.pageNumber}));
+        eventBus.on('scalechange', e => this.props.onScaleChange(e.scale));
+        eventBus.on('pagechange', e => this.props.onPageChange(e.pageNumber));
         eventBus.on('textlayerrendered', e => {});
         
         return eventBus;
@@ -89,6 +89,10 @@ class Container extends Component {
             container: viewerContainer,
             eventBus: this.eventBus
         });
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        console.log(nextProps);
     }
     
     // TODO is this really necessary?  Can we use componentWillRecieveProps instead?
@@ -133,5 +137,17 @@ Container.propTypes = {
     onScaleChange: PropTypes.func.isRequired,
     onPageChange: PropTypes.func.isRequired,
 };
+
+// const mapStateToProps = (state, ownProps) => {
+//     return {state};
+// };
+//
+// const mapDispatchToProps = dispatch => {
+//     return {
+//         actions: bindActionCreators({onScaleChanged, onPageChange}, dispatch)
+//     };
+// };
+//
+// export default connect(mapStateToProps, mapDispatchToProps, null,  {withRef: true})(Container);
 
 export default Container;

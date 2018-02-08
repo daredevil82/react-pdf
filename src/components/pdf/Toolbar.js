@@ -1,20 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
 import {
     Nav,
     Navbar,
-    NavItem
+    NavItem,
 } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import {onZoomIn, onZoomOut} from "../../actions/pdfActions";
+
 const PdfNavbar = styled.div`
-  .container {
-    width: 900px
-  }
-  
-  position: absolute;
-  top: 0;
-  left: 0;
+  //position: absolute;
+  //top: 0;
+  //left: 0;
 `;
 
 const ZoomItem = styled.div`
@@ -32,11 +32,11 @@ const Toolbar = props => {
             <Navbar>
                 <Nav pullLeft>
                     <NavItem>
-                        <ZoomItem onClick={e => props.onZoomIn(e)}>
+                        <ZoomItem onClick={e => props.actions.onZoomIn(e)}>
                             <i className="fa fa-plus-circle"></i>
                         </ZoomItem>
                         <ZoomItem>Zoom: {(props.scale * 100).toFixed(0)}%</ZoomItem>
-                        <ZoomItem onClick={e => props.onZoomOut(e)}>
+                        <ZoomItem onClick={e => props.actions.onZoomOut(e)}>
                             <i className="fa fa-minus-circle"></i>
                         </ZoomItem>
                     </NavItem>
@@ -53,11 +53,19 @@ const Toolbar = props => {
 };
 
 Toolbar.propTypes = {
-    onZoomIn: PropTypes.func.isRequired,
-    onZoomOut: PropTypes.func.isRequired,
+    // onZoomIn: PropTypes.func.isRequired,
+    // onZoomOut: PropTypes.func.isRequired,
     page: PropTypes.number,
     pageCount: PropTypes.number,
-    scale: PropTypes.number
+    scale: PropTypes.number,
+    actions: PropTypes.object.isRequired
+    
 };
 
-export default Toolbar
+const mapDispatchToProps = dispatch => {
+    return {
+        actions: bindActionCreators({onZoomIn, onZoomOut}, dispatch)
+    }
+};
+
+export default connect(null,  mapDispatchToProps)(Toolbar);
