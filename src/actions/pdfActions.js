@@ -1,4 +1,5 @@
 import * as types from './actionTypes';
+import SearchAPI from './../api/SearchAPI';
 
 export const onZoomIn = zoom => {
     return {type: types.ON_ZOOM_IN, zoom};
@@ -10,4 +11,16 @@ export const onZoomOut = zoom => {
 
 export const onPageChange = currentPage => {
     return {type: types.ON_PAGE_CHANGE, currentPage};
+};
+
+export const onSearchSuccess = results => {
+    console.debug(results);
+    return {type: types.ON_SEARCH_EXECUTE, results}
+};
+
+export const onSearchExecute = query => {
+    return dispatch => {
+        let results = SearchAPI.query(query);
+        return dispatch(onSearchSuccess(results));
+    }
 };
