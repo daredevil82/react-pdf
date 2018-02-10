@@ -31,9 +31,6 @@ const Input = props => {
                             Search
                         </Button>
                     </Row>
-                    <Row>
-                        Result Count
-                    </Row>
                 </Form>
             </Row>
         </Row>

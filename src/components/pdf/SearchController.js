@@ -45,14 +45,65 @@ class SearchController extends PDFFindController {
             this._renderMatchForDisplay(this.match, e.source);
     }
     
+    
     /**
-     * For a given match, scroll to the location and render the match highlighted
+     * Jump to the location and highlight the selected match
+     * @param match Object with page, content and query properties
+     */
+    displayMatch(match) {
+        this.selected.pageIdx = match.page;
+        this.pdfViewer.currentPageNumber = match.page;
+        
+        const pageView = this.pdfViewer.getPageView(match.page);
+        const page = document.getQuerySelector(`[data-page-number="${match.page}"]`);
+        page.scrollIntoView();
+        this._renderMatchForDisplay(match, pageView.textLayer);
+        
+    }
+    
+    /**
+     * For a given match, scroll to the location and render the match highlighted across a number
+     * of rendered divs
      * @param match
      * @param pageView
      * @private
      */
     _renderMatchForDisplay(match, pageView) {
-        console.error('Not implemented');
+        let index = 0;
+        
+        const textDivs = pageView.textDivs,
+              queryLen = match.query.length,
+              matchDivs = [];
+        
+        for (let itemIdx = 0, itemLen = textDivs.length; itemIdx < itemLen; itemIdx++) {
+            index = textDivs[itemIdx].textContent.toLowerCase().indexOf(match.query.toLowerCase());
+            if (index >= 0) {
+                matchDivs.push({
+                    div: textDivs[itemIdx],
+                    start: index,
+                    end: index + queryLen
+                });
+            }
+        }
+        
+        if (matchDivs.length === 0)
+            console.error('No matches found');
+        else if (matchDivs.length === 1) {
+            console.debug('One match found');
+            matchDivs[0].div.scrollIntoView();
+        }
+        else {
+            
+            // TODO Unimplemented here, need to figure how to scroll to a specific match
+            console.debug(`${matchDivs.length} elements found`);
+            const matchElements = [];
+            matchDivs.forEach((item, idx) => {
+                matchElements.push(item.div.textContent.toLowerCase());
+            });
+            
+            matchElements[0].scrollIntoView();
+            
+        }
     }
     
     /**
@@ -158,9 +209,10 @@ class SearchController extends PDFFindController {
                   afterString = joinString(after);
             
             snippets.push({
-                content: `${beforeString}<span class='result'>${textQuery}</span>${afterString}`,
+                content: `${beforeString} <span class='result'>${textQuery}</span> ${afterString}`,
                 originalContent: `${beforeString}${query}${afterString}`,
                 page: matches[i].page + 1,
+                query: query,
                 properties: {
                     begin: matches[i].begin,
                     end: matches[i].end,

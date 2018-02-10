@@ -13,14 +13,14 @@ export const onPageChange = currentPage => {
     return {type: types.ON_PAGE_CHANGE, currentPage};
 };
 
-export const onSearchSuccess = results => {
+export const onSearchComplete = results => {
     console.debug(results);
-    return {type: types.ON_SEARCH_EXECUTE, results}
+    return {type: types.ON_SEARCH_COMPLETE, results}
 };
 
 export const onSearchExecute = query => {
     return dispatch => {
         let results = SearchAPI.query(query);
-        return dispatch(onSearchSuccess(results));
+        return dispatch(onSearchComplete(results));
     }
 };

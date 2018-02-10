@@ -13,6 +13,7 @@ import {
 import styled from 'styled-components';
 
 import Input from './Input';
+import Results from './Results';
 
 const SearchContainer = styled.div`
   .row {
@@ -31,11 +32,13 @@ class SidePanel extends Component {
         
         this.state = {
             currentSearch: '',
-            searchDisabled: true
+            searchDisabled: true,
+            results: []
         };
         
         this.onSearchUpdate = this.onSearchUpdate.bind(this);
         this.onSearchExecute = this.onSearchExecute.bind(this);
+        this.onSearchItemClick = this.onSearchItemClick.bind(this);
     }
     
     onSearchUpdate(e) {
@@ -53,6 +56,20 @@ class SidePanel extends Component {
         this.props.actions.onSearchExecute(this.state.currentSearch);
     }
     
+    onSearchItemClick(e, props) {
+        console.log(e);
+        console.log(props)
+    }
+    
+    componentWillReceiveProps(nextProps) {
+        console.log(`${this.constructor.name}`);
+        console.log(nextProps);
+        
+        this.setState({
+            results: nextProps.results
+        });
+    }
+    
     render () {
         return(
             <SearchContainer>
@@ -65,13 +82,20 @@ class SidePanel extends Component {
                         />
                     </Panel>
                 </Row>
+                <Row>
+                    <Results results={this.state.results}
+                             onClick={this.onSearchItemClick}
+                    />
+                </Row>
             </SearchContainer>
         )
     }
     
 }
 
-SidePanel.propTypes = {};
+SidePanel.propTypes = {
+    results: PropTypes.array
+};
 
 const mapStateToProps = (state, ownProps) => ({
     results: state.results
