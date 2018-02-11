@@ -5,6 +5,7 @@
   "dependencies": {
     "bootstrap": "3.3.7",
     "font-awesome": "^4.7.0",
+    "lodash": "^4.17.5",
     "pdfjs-dist": "^2.0.301",
     "prop-types": "^15.6.0",
     "query-string": "^5.0.1",
@@ -13,6 +14,8 @@
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
+    "redux-immutable-state-invariant": "^2.1.0",
+    "redux-thunk": "^2.2.0",
     "string-similarity": "^1.2.0",
     "styled-components": "^3.0.2"
   },

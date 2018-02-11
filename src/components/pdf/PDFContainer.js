@@ -2,14 +2,17 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {PDFJS as PDFJSViewer} from 'pdfjs-dist/web/pdf_viewer';
 
+import SearchController from './SearchController';
+import range from 'lodash/range';
+
 import styled from 'styled-components';
 import 'pdfjs-dist/web/pdf_viewer.css';
 
+import SearchAPI from './../../api/SearchAPI';
+
 const PDFContainer = styled.div`
-  overflow: auto;
-  position: absolute;
+  overflow: hidden;
   top: 52px;
-  bottom: 0;
   width: 100%;
   
   > .pdfViewer {
@@ -39,9 +42,8 @@ class Container extends Component {
         // Sometimes, its necessary to keep component level variables outside of React's state
         // because of the asynchronous batch updates of state changes.
         this.pdfViewer = null;
+        this._pageLoadHandler = this._pageLoadHandler.bind(this);
         this.eventBus = this.initEventBus();
-        //this._pageLoadHandler = this._pageLoadHandler.bind(this);
-        
     }
     
     /**
@@ -49,7 +51,29 @@ class Container extends Component {
      * @private
      */
     _pageLoadHandler() {
+        let pageItems = null,
+            strBuf = [];
+        
+        const pageProcessor = (idx, result) => {
+            pageItems = result.items;
     
+            if (pageItems.length === 0) {
+                this.searchController.setPageTextSource(idx, '');
+                return;
+            }
+    
+            for (let j = 0; j < pageItems.length; j++)
+                strBuf.push(pageItems[j].str);
+    
+            this.searchController.setPageTextSource(idx,  strBuf.join(''));
+            strBuf.length = 0;
+        };
+    
+        // Process all the pages in the document and store in index for search
+        range(this.pdfViewer.pdfDocument.numPages)
+                .map(pageNum => this.pdfViewer.getPageTextContent(pageNum)
+                                    .then(result => pageProcessor(pageNum, result)));
+   
     }
     
     /**
@@ -64,18 +88,30 @@ class Container extends Component {
             this.pdfViewer.currentScale = 1.0;
         });
         
+        eventBus.on('pagesloaded', this._pageLoadHandler);
+        
         eventBus.on('pagechange', e => this.props.onPageChange(e.pageNumber));
-        eventBus.on('textlayerrendered', e => {});
+        eventBus.on('textlayerrendered', e => {
+            console.debug(e);
+        });
         
         return eventBus;
     }
     
     componentDidMount() {
-        let viewerContainer = document.getElementById('viewer-container');
+        const viewerContainer = document.getElementById('viewer-container');
         this.pdfViewer = new PDFJSViewer.PDFViewer({
             container: viewerContainer,
             eventBus: this.eventBus
         });
+        
+        this.searchController = new SearchController({
+            pdfViewer: this.pdfViewer
+        });
+        
+        this.pdfViewer.setFindController(this.searchController);
+        
+        SearchAPI.instance = this.searchController;
     }
     
     render () {

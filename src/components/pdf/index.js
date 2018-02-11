@@ -1,12 +1,24 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import PDFContainer from './PDFContainer';
-import Toolbar from './Toolbar';
+import {Grid, Row, Col} from 'react-bootstrap';
 
 import pdfjslib from 'pdfjs-dist/webpack';
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+
+import PDFContainer from './PDFContainer';
+import Toolbar from './Toolbar';
+import SearchPanel from './../searchPanel';
 import {onZoomIn, onZoomOut, onPageChange} from "../../actions/pdfActions";
+
+import styled from 'styled-components';
+
+const RowWrapper = styled.div`
+  .row {
+    height: 100vh;
+    overflow: scroll;
+  }
+`;
 
 /**
  * Primary component of the PDF viewer.  Responsible for loading the document content
@@ -39,7 +51,7 @@ class PDF extends Component {
                        this.setState({
                            pageCount: document.numPages,
                            page: this.container.pdfViewer.currentPageNumber,
-                           scale: this.container.pdfViewer.currentScaleValue,
+                           scale: this.container.pdfViewer.currentScaleValue
                        });
                        
                    }, err => {
@@ -62,15 +74,28 @@ class PDF extends Component {
     
     render () {
         return(
-            <div>
-                <Toolbar page={this.props.page}
-                         pageCount={this.state.pageCount}
-                         scale={this.props.scale}
-                />
-                <PDFContainer onPageChange={this.onPageNumberChanged}
-                              ref={ref => this.container = ref}
-                />
-            </div>
+            <Grid>
+                <Row>
+                    <Col md={10} sm={10} xs={10} lg={10}>
+                        <Row>
+                            <Toolbar page={this.props.page}
+                                     pageCount={this.state.pageCount}
+                                     scale={this.props.scale}
+                            />
+                        </Row>
+                        <RowWrapper>
+                            <Row>
+                                <PDFContainer onPageChange={this.onPageNumberChanged}
+                                              ref={ref => this.container = ref}
+                                />
+                            </Row>
+                        </RowWrapper>
+                    </Col>
+                    <Col md={2} sm={2} xs={2} lg={2}>
+                        <SearchPanel/>
+                    </Col>
+                </Row>
+            </Grid>
         )
     }
 }

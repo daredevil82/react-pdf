@@ -34,7 +34,7 @@ const Toolbar = props => {
                         </ZoomItem>
                     </NavItem>
                 </Nav>
-                <Nav pullRight>
+                <Nav>
                     <NavItem>
                         <div className="page-number">Page {props.page} of {props.pageCount}</div>
                     </NavItem>

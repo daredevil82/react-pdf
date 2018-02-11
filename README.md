@@ -15,3 +15,9 @@ Extra features include a customized search representation with snippet display o
 
 Use a query parameter `&file=https://path/to/document.pdf` if you want a specific file to load.  
 Missing parameter will use the default Mozilla Tracemonkey PDF.
+
+## Known bugs and issues
+
+* Application is not very performant because of unnecessary re-rendering occuring with PDF document and search panel.  Fix implementation would require adding `shouldComponentUpdate` and listening for state 
+* PDF search is based on the actual non-rendered text from the document.  Sometimes words in match snippets will be missing spaces
+* Cannot jump to a specific match and highlight just that match
