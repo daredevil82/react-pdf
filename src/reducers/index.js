@@ -16,8 +16,8 @@ const pdfReducer = (state = initialState.pdf, action) => {
             return Object.assign({}, state, {query: action.query});
         case types.ON_SEARCH_COMPLETE:
             return Object.assign({}, state, {results: action.results});
-            
-            
+        case types.ON_RESULT_SELECT:
+            return Object.assign({}, state, {match: action.match});
         default:
             return state;
     }

@@ -16,6 +16,11 @@ const HighlightQuery = styled.div`
   }
 `;
 
+const ResultWrapper = styled.div`
+  max-height: 600px;
+  overflow: scroll;
+`;
+
 const ResultItem = props => {
     return (
         <ListGroupItem onClick={e => props.onClick(e, props)}>
@@ -23,6 +28,10 @@ const ResultItem = props => {
                 <HighlightQuery>
                     <div dangerouslySetInnerHTML={{__html: props.item.content}}></div>
                 </HighlightQuery>
+            </Row>
+            <hr/>
+            <Row>
+                Page <strong>{props.item.page}</strong>
             </Row>
         </ListGroupItem>
     );
@@ -58,9 +67,11 @@ const Results = props => {
     return (
         <div>
             <MatchCountElement resultCount={props.results.length}/>
-            <ListGroup>
-                {resultItems}
-            </ListGroup>
+            <ResultWrapper>
+                <ListGroup>
+                    {resultItems}
+                </ListGroup>
+            </ResultWrapper>
         </div>
     )
 };

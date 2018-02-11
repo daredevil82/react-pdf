@@ -69,18 +69,11 @@ class Container extends Component {
             strBuf.length = 0;
         };
     
-        const _loadingPromise = new Promise(resolve => {
-            const promises = range(this.pdfViewer.pdfDocument.numPages)
+        // Process all the pages in the document and store in index for search
+        range(this.pdfViewer.pdfDocument.numPages)
                 .map(pageNum => this.pdfViewer.getPageTextContent(pageNum)
                                     .then(result => pageProcessor(pageNum, result)));
-            Promise.all(promises).then(() => resolve(true));
-        });
-    
-        _loadingPromise.then(() => {
-            //this.props.overlayVisibility(false);
-        });
-        
-        
+   
     }
     
     /**
@@ -99,7 +92,7 @@ class Container extends Component {
         
         eventBus.on('pagechange', e => this.props.onPageChange(e.pageNumber));
         eventBus.on('textlayerrendered', e => {
-            this.searchController._textLayerRenderComplete(e)
+            console.debug(e);
         });
         
         return eventBus;

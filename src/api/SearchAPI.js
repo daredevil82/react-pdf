@@ -29,6 +29,12 @@ class SearchAPI {
         return SearchAPI.instance.controller.queryDocument(query);
     }
     
+    static jumpToMatch(match) {
+        
+        console.log(match);
+        SearchAPI.instance.controller.displayMatch(match);
+    }
+    
 }
 
 export default SearchAPI;

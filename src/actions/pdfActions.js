@@ -6,7 +6,7 @@ export const onZoomIn = zoom => {
 };
 
 export const onZoomOut = zoom => {
-    return {type: types.ON_ZOOM_OUT, zoom}
+    return {type: types.ON_ZOOM_OUT, zoom};
 };
 
 export const onPageChange = currentPage => {
@@ -15,12 +15,17 @@ export const onPageChange = currentPage => {
 
 export const onSearchComplete = results => {
     console.debug(results);
-    return {type: types.ON_SEARCH_COMPLETE, results}
+    return {type: types.ON_SEARCH_COMPLETE, results};
 };
 
 export const onSearchExecute = query => {
     return dispatch => {
-        let results = SearchAPI.query(query);
+        const results = SearchAPI.query(query);
         return dispatch(onSearchComplete(results));
-    }
+    };
+};
+
+export const onResultSelection = match => {
+    SearchAPI.jumpToMatch(match.item);
+    return {type: types.ON_RESULT_SELECT, match};
 };

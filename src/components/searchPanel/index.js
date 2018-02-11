@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import {onSearchExecute} from "../../actions/pdfActions";
+import {onSearchExecute, onResultSelection} from "../../actions/pdfActions";
 
 import {
     Row,
@@ -58,7 +58,8 @@ class SidePanel extends Component {
     
     onSearchItemClick(e, props) {
         console.log(e);
-        console.log(props)
+        console.log(props);
+        this.props.actions.onResultSelection(props);
     }
     
     componentWillReceiveProps(nextProps) {
@@ -103,7 +104,7 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = dispatch => {
     return {
-        actions: bindActionCreators({onSearchExecute}, dispatch)
+        actions: bindActionCreators({onSearchExecute, onResultSelection}, dispatch)
     }
 };
 

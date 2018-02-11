@@ -3,7 +3,6 @@
  */
 
 import {PDFFindController} from 'pdfjs-dist/lib/web/pdf_find_controller';
-import {findBestMatch} from 'string-similarity';
 
 class SearchController extends PDFFindController {
     constructor({pdfViewer}) {
@@ -36,15 +35,15 @@ class SearchController extends PDFFindController {
                 this.matches.push({page: i, match: this.pageMatches[i]});
         }
         
+        this.executeCommand('find', {
+            caseSensitive: false,
+            highlightAll: true,
+            query: query
+        });
+        
         const convertedMatches = this._convertMatchesForSnippet(this.matches, query);
         return this._renderSnippets(convertedMatches, query);
     }
-    
-    _textLayerRenderComplete(e) {
-        if (this.match && e.pageNumber === this.match.page)
-            this._renderMatchForDisplay(this.match, e.source);
-    }
-    
     
     /**
      * Jump to the location and highlight the selected match
@@ -54,56 +53,9 @@ class SearchController extends PDFFindController {
         this.selected.pageIdx = match.page;
         this.pdfViewer.currentPageNumber = match.page;
         
-        const pageView = this.pdfViewer.getPageView(match.page);
-        const page = document.getQuerySelector(`[data-page-number="${match.page}"]`);
+        const page = document.querySelector(`[data-page-number="${match.page}"]`);
         page.scrollIntoView();
-        this._renderMatchForDisplay(match, pageView.textLayer);
         
-    }
-    
-    /**
-     * For a given match, scroll to the location and render the match highlighted across a number
-     * of rendered divs
-     * @param match
-     * @param pageView
-     * @private
-     */
-    _renderMatchForDisplay(match, pageView) {
-        let index = 0;
-        
-        const textDivs = pageView.textDivs,
-              queryLen = match.query.length,
-              matchDivs = [];
-        
-        for (let itemIdx = 0, itemLen = textDivs.length; itemIdx < itemLen; itemIdx++) {
-            index = textDivs[itemIdx].textContent.toLowerCase().indexOf(match.query.toLowerCase());
-            if (index >= 0) {
-                matchDivs.push({
-                    div: textDivs[itemIdx],
-                    start: index,
-                    end: index + queryLen
-                });
-            }
-        }
-        
-        if (matchDivs.length === 0)
-            console.error('No matches found');
-        else if (matchDivs.length === 1) {
-            console.debug('One match found');
-            matchDivs[0].div.scrollIntoView();
-        }
-        else {
-            
-            // TODO Unimplemented here, need to figure how to scroll to a specific match
-            console.debug(`${matchDivs.length} elements found`);
-            const matchElements = [];
-            matchDivs.forEach((item, idx) => {
-                matchElements.push(item.div.textContent.toLowerCase());
-            });
-            
-            matchElements[0].scrollIntoView();
-            
-        }
     }
     
     /**
